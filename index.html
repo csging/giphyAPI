@@ -3,30 +3,188 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>GIPHY API</title>
-    <link rel="stylesheet" type="text/css" href="assets/reset.css">
-    <link rel="stylesheet" type="text/css" href="assets/style.css">
+    <title>GIPHY Search</title>
+    <!-- <link rel="stylesheet" type="text/css" href="assets/reset.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="assets/style.css"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
 </head>
+<style>
+    #instructions {
+        float: left;
+    }
+    
+    #title {
+        background-color: rgb(21, 21, 92);
+        color: rgb(241, 241, 241);
+    }
+    
+    .container {
+        border-radius: 5px;
+        border-width: medium;
+    }
+    
+    #search-form {
+        /* margin: 10px; */
+        /* border-bottom: 6px solid; */
+    }
+</style>
 
 <body>
-    <div class="container">
-        <h1>GIPHY API Search </h1>
-        <br>
-        <div id="buttons-view"></div>
-        <br>
-        <form id="search-form">
-            <label for="search-input">Add button to search </label>
-            <input type="text" id="search-input">
 
-            <input id="add-search" type="submit" value="add!">
-        </form>
-        <div id="gifs-appear-here"></div>
+    <div class="container" id="title">
+        <div class="row">
+            <div class="col-md-4">
+                <h1>Giphy API Search</h1>
+            </div>
+
+            <div class="col-md-6" id="instructions">
+                <h4>Click a topic button to generate 10 gifs!</h4>
+                <h4>Enter in your own topic to generate a new topic button!</h4>
+                <h4>Click the gif to play or pause the animation!</h4>
+            </div>
+            <!-- </div> -->
+
+
+            <!-- <div class="container"> -->
+            <!-- <div class="row"> -->
+            <div class="col-sm-1">
+                <!-- <nav class="navbar navbar-light text-center"> -->
+                <!-- <ul class="nav justify-content-center text-right"> -->
+                <!-- <li class="nav-item"> -->
+                <a class="btn btn-link" href="portfolio.html">Return to Portfolio</a>
+                <!-- </li> -->
+                <!-- </ul> -->
+                <!-- </nav> -->
+            </div>
+        </div>
+        <!-- </div> -->
+
+
+
+
     </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script type="text/javascript" src="javascript/app.js" href="javascript/app.js"></script>
+
+    <br>
+
+    <div class="container" id="forms">
+        <div class="row">
+            <div class="col-md-12">
+                <form id="search-form">
+                    <label for="search-input">Add button to search </label>
+                    <input type="text" id="search-input">
+                    <input id="submitBtn" type="submit" value="add">
+                    <br>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="buttons">
+        <div class="row">
+            <div class="col-md-12">
+                <br>
+                <div id="buttons-view"></div>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="gifs-appear-here"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        $(document).ready(function() {
+            var topics = ["dogs", "pokemon", "memes", "futurama", "dank memes", "super smash bros", "cannabis"]
+            var stillImg;
+            var animateImg;
+
+            function renderButtons() {
+                $("#buttons-view").empty();
+                for (var i = 0; i < topics.length; i++) {
+                    var a = $("<button>");
+                    a.addClass("btn btn-info");
+                    a.attr("id", "topix");
+                    a.attr("data-name", topics[i]);
+                    a.val(topics[i]);
+                    a.text(topics[i]);
+                    $("#buttons-view").append(a);
+                    // console.log(a);
+                }
+            };
+
+            function submit() {
+                event.preventDefault();
+                var newTopic = $("#search-input").val().trim();
+                topics.push(newTopic);
+                $("#search-input").val('');
+                renderButtons();
+            };
+
+            $("#submitBtn").on("click", function(event) {
+                submit();
+            });
+
+            renderButtons();
+
+            function displayGifs() {
+
+                var person = $(this).attr("data-name");
+                var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + person + "&api_key=JIBAJQxj1zGsIokhhVP2eNIpXrBQXYhi&limit=10";
+
+                $.ajax({
+                        url: queryURL,
+                        method: "GET"
+                    })
+                    .then(function(response) {
+                        $("#gifs-appear-here").empty();
+                        var results = response.data;
+
+                        for (var i = 0; i < results.length; i++) {
+
+                            var gifDiv = $("<div class='newGif'>");
+                            stillImg = response['data'][i]['images']['fixed_height_still']['url'];
+                            animateImg = response['data'][i]['images']['fixed_height']['url'];
+                            console.log("still: " + stillImg, "playing: " + animateImg);
+
+                            var rating = results[i].rating;
+                            var p = $("<p>").text("Rating: " + rating);
+                            var image = $("<img>");
+                            image.attr("src", stillImg);
+                            image.attr("data-still", stillImg);
+                            image.attr("data-animate", animateImg);
+                            image.attr("data-state", 'still');
+                            image.addClass('gifs');
+                            gifDiv.append(p);
+                            gifDiv.append(image);
+                            $("#gifs-appear-here").prepend(gifDiv);
+                        }
+                    });
+            };
+
+            function playPause() {
+                var state = $(this).attr("data-state");
+
+                if (state === "still") {
+                    $(this).attr("src", $(this).attr("data-animate"));
+                    $(this).attr("data-state", "animate");
+                } else {
+                    $(this).attr("src", $(this).attr("data-still"));
+                    $(this).attr("data-state", "still");
+                }
+            };
+
+            $(document).on("click", "#topix", displayGifs);
+            $(document).on("click", "img", playPause);
+        });
+    </script>
 </body>
 
 </html>
