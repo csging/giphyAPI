@@ -1,7 +1,7 @@
 var topics;
 var stillImg;
 var animateImg;
-var queryURL = "https://api.giphy.com/v1/gifs/trending?api_key=JIBAJQxj1zGsIokhhVP2eNIpXrBQXYhi";
+var queryURL = "http://api.giphy.com/v1/gifs/trending?api_key=JIBAJQxj1zGsIokhhVP2eNIpXrBQXYhi";
 $(document).ready(function() {
     topics = ["dogs", "pokemon", "memes", "dank memes", "super smash bros", "cannabis"]
 
